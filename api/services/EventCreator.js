@@ -40,7 +40,14 @@ const error = (label, body) => createEvent({
   body,
 });
 
+const warn = (label, body) => createEvent({
+  type: Event.types.WARN,
+  label,
+  body,
+});
+
 module.exports = {
   audit,
   error,
+  warn,
 };

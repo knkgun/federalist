@@ -506,6 +506,7 @@ describe('Webhook API', () => {
     let auditStub;
     beforeEach(() => {
       auditStub = sinon.stub(EventCreator, 'audit').resolves();
+      auditStub = sinon.stub(EventCreator, 'warn').resolves();
     });
 
     afterEach(() => {

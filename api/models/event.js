@@ -2,6 +2,7 @@ module.exports = (sequelize, DataTypes) => {
   const types = {
     ERROR: 'error',
     AUDIT: 'audit',
+    WARN: 'warn',
   };
 
   const labels = {

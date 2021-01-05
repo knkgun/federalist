@@ -56,6 +56,7 @@ const loadBuildUserAccessToken = async (build) => {
 };
 
 const reportBuildStatus = async (build) => {
+  let options;
   const sha = build.clonedCommitSha || build.requestedCommitSha;
   if (!sha) {
     throw new Error('Build or commit sha undefined. Unable to report build status');
@@ -68,7 +69,7 @@ const reportBuildStatus = async (build) => {
 
   const site = build.Site;
 
-  const options = {
+  options = {
     owner: site.owner,
     repo: site.repository,
     sha,
@@ -88,7 +89,14 @@ const reportBuildStatus = async (build) => {
     options.target_url = url.resolve(config.app.hostname, `/sites/${site.id}/builds/${build.id}/logs`);
     options.description = 'The build has encountered an error.';
   }
-  return GitHub.sendCreateGithubStatusRequest(accessToken, options);
+  return GitHub.sendCreateGithubStatusRequest(accessToken, options)
+    .catch(err => {
+      EventCreator.warn(Event.labels.BUILD_STATUS, {
+        buildId: build.id,
+        options,
+        err: err.stack,
+      });
+    });
 };
 
 const fetchContent = async (build, path) => {
