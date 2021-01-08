@@ -44,6 +44,7 @@ describe('SiteCreator', () => {
       expect(site.Builds).to.have.length(1);
       expect(site.Builds[0].user).to.equal(user.id);
       expect(site.defaultBranch).to.equal(defaultBranch);
+      expect(site.accessToken).to.equal(user.githubAccessToken);
     };
 
     const afterCreateSite = (owner, repository) => Site.findOne({
@@ -292,6 +293,7 @@ describe('SiteCreator', () => {
           expect(site.owner).to.equal(siteParams.owner);
           expect(site.repository).to.equal(siteParams.repository);
           expect(site.defaultBranch).to.equal('main');
+          expect(site.accessToken).to.equal(user.githubAccessToken);
 
           return Site.findOne({
             where: {

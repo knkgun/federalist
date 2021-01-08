@@ -73,6 +73,10 @@ function isEmptyOrBranch(value) {
 
 module.exports = (sequelize, DataTypes) => {
   const Site = sequelize.define('Site', {
+    accessToken: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     demoBranch: {
       type: DataTypes.STRING,
       validate: {

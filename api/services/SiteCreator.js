@@ -9,11 +9,12 @@ const apiClient = new CloudFoundryAPIClient();
 
 const defaultEngine = 'jekyll';
 
-function paramsForNewSite(params) {
+function paramsForNewSite(params, user) {
   const owner = params.owner ? params.owner.toLowerCase() : null;
   const repository = params.repository ? params.repository.toLowerCase() : null;
   const subdomain = generateSubdomain(owner, repository);
   return {
+    accessToken: user.githubAccessToken,
     owner,
     repository,
     defaultBranch: params.defaultBranch,
@@ -196,8 +197,7 @@ function createSite({ user, siteParams }) {
   const templateName = siteParams.template;
 
   const template = templateName && TemplateResolver.getTemplate(templateName);
-  const newSiteParams = paramsForNewSite(siteParams);
-
+  const newSiteParams = paramsForNewSite(siteParams, user);
   if (template) {
     return createSiteFromTemplate({ siteParams: newSiteParams, template, user });
   }

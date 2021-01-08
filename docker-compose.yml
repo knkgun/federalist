@@ -30,7 +30,7 @@ services:
       FEATURE_PROXY_EDGE_DYNAMO: 'true'
       FEATURE_ADMIN_AUTH: 'true'
       APP_HOSTNAME: http://localhost:1337
-      AUTH_IDP: uaa
+      AUTH_IDP: github
   admin-client:
     build:
       dockerfile: ./admin-client/Dockerfile-admin

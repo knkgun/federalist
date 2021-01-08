@@ -8,7 +8,7 @@ function generateUniqueAtts() {
   const res = {
     owner: `repo-owner-${siteAttsStep}`,
     repository: `repo-name-${siteAttsStep}`,
-
+    accessToken: `accessToken-${siteAttsStep}`,
   };
   siteAttsStep += 1;
   return res;
@@ -21,9 +21,10 @@ function makeAttributes(overrides = {}) {
     users = Promise.all([userFactory()]);
   }
 
-  const { owner, repository } = generateUniqueAtts();
+  const { accessToken, owner, repository } = generateUniqueAtts();
 
   return {
+    accessToken,
     owner,
     repository,
     engine: 'jekyll',

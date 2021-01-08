@@ -321,93 +321,91 @@ describe('Site API', () => {
         .catch(done);
     });
 
-    it('should create a new site from an existing repository', (done) => {
+    it('should create a new site from an existing repository', async () => {
       const siteOwner = crypto.randomBytes(3).toString('hex');
       const siteRepository = crypto.randomBytes(3).toString('hex');
 
       cfMockServices(siteOwner, siteRepository);
 
-      factory.user()
-        .then((user) => {
-          githubAPINocks.userOrganizations({
-            accessToken: user.githubAccessToken,
-            organizations: [{ login: siteOwner }],
-          });
+      const user = await factory.user();
+    
+      githubAPINocks.userOrganizations({
+        accessToken: user.githubAccessToken,
+        organizations: [{ login: siteOwner }],
+      });
 
-          return authenticatedSession(user);
+      const cookie = await authenticatedSession(user);
+
+      const response = await request(app)
+        .post('/v0/site')
+        .set('x-csrf-token', csrfToken.getToken())
+        .send({
+          owner: siteOwner,
+          repository: siteRepository,
+          defaultBranch: 'main',
+          engine: 'jekyll',
         })
-        .then(cookie => request(app)
-          .post('/v0/site')
-          .set('x-csrf-token', csrfToken.getToken())
-          .send({
-            owner: siteOwner,
-            repository: siteRepository,
-            defaultBranch: 'main',
-            engine: 'jekyll',
-          })
-          .set('Cookie', cookie)
-          .expect(200))
-        .then((response) => {
-          validateAgainstJSONSchema('POST', '/site', 200, response.body);
-          return Site.findOne({
-            where: {
-              owner: siteOwner,
-              repository: siteRepository,
-            },
-          });
-        })
-        .then((site) => {
-          expect(site).to.not.be.undefined;
-          expect(saveSiteStub.calledOnce).to.equal(true);
-          done();
-        })
-        .catch(done);
+        .set('Cookie', cookie)
+        .expect(200);
+
+      validateAgainstJSONSchema('POST', '/site', 200, response.body);
+
+      const site = await Site.findOne({
+        where: {
+          owner: siteOwner,
+          repository: siteRepository,
+        },
+      });
+
+      expect(site).to.not.be.undefined;
+      expect(saveSiteStub.calledOnce).to.equal(true);
+      expect(site.accessToken).to.equal(user.githubAccessToken);
     });
 
-    it('should not call ProxyDataSync when FEATURE_PROXY_EDGE_DYNAMO=false', (done) => {
+    it('should not call ProxyDataSync when FEATURE_PROXY_EDGE_DYNAMO=false', async () => {
       const siteOwner = crypto.randomBytes(3).toString('hex');
       const siteRepository = crypto.randomBytes(3).toString('hex');
 
       cfMockServices(siteOwner, siteRepository);
 
-      factory.user()
-        .then((user) => {
-          githubAPINocks.userOrganizations({
-            accessToken: user.githubAccessToken,
-            organizations: [{ login: siteOwner }],
-          });
-          process.env.FEATURE_PROXY_EDGE_DYNAMO = 'false';
-          return authenticatedSession(user);
+      const user = await factory.user();
+
+      githubAPINocks.userOrganizations({
+        accessToken: user.githubAccessToken,
+        organizations: [{ login: siteOwner }],
+      });
+
+      process.env.FEATURE_PROXY_EDGE_DYNAMO = 'false';
+
+      const cookie = await authenticatedSession(user);
+
+      const response = await request(app)
+        .post('/v0/site')
+        .set('x-csrf-token', csrfToken.getToken())
+        .send({
+          owner: siteOwner,
+          repository: siteRepository,
+          defaultBranch: 'main',
+          engine: 'jekyll',
         })
-        .then(cookie => request(app)
-          .post('/v0/site')
-          .set('x-csrf-token', csrfToken.getToken())
-          .send({
+        .set('Cookie', cookie)
+        .expect(200);
+
+        validateAgainstJSONSchema('POST', '/site', 200, response.body);
+
+        const site = await Site.findOne({
+          where: {
             owner: siteOwner,
             repository: siteRepository,
-            defaultBranch: 'main',
-            engine: 'jekyll',
-          })
-          .set('Cookie', cookie)
-          .expect(200))
-        .then((response) => {
-          validateAgainstJSONSchema('POST', '/site', 200, response.body);
-          return Site.findOne({
-            where: {
-              owner: siteOwner,
-              repository: siteRepository,
-            },
-          });
-        })
-        .then((site) => {
-          expect(site).to.not.be.undefined;
-          expect(saveSiteStub.notCalled).to.equal(true);
-          done();
-        })
-        .catch(done);
+          },
+        });
+
+        expect(site).to.not.be.undefined;
+        expect(saveSiteStub.notCalled).to.equal(true);
+        expect(site.accessToken).to.equal(user.githubAccessToken);
     });
 
-    it('should create a new repo and site from a template', (done) => {
+    it('should create a new repo and site from a template', async () => {
       const siteOwner = crypto.randomBytes(3).toString('hex');
       const siteRepository = crypto.randomBytes(3).toString('hex');
 
@@ -422,7 +420,9 @@ describe('Site API', () => {
         repo: siteRepository,
       });
 
-      authenticatedSession().then(cookie => request(app)
+      const cookie = await authenticatedSession();
+
+      const response = await request(app)
         .post('/v0/site')
         .set('x-csrf-token', csrfToken.getToken())
         .send({
@@ -433,22 +433,20 @@ describe('Site API', () => {
           template: 'uswds2',
         })
         .set('Cookie', cookie)
-        .expect(200))
-        .then((response) => {
-          validateAgainstJSONSchema('POST', '/site', 200, response.body);
-          return Site.findOne({
-            where: {
-              owner: siteOwner,
-              repository: siteRepository,
-            },
-          });
-        })
-        .then((site) => {
-          expect(site).to.not.be.undefined;
-          expect(createRepoNock.isDone()).to.equal(true);
-          done();
-        })
-        .catch(done);
+        .expect(200);
+
+      validateAgainstJSONSchema('POST', '/site', 200, response.body);
+
+      const site = await Site.findOne({
+        where: {
+          owner: siteOwner,
+          repository: siteRepository,
+        },
+      });
+
+      expect(site).to.not.be.undefined;
+      expect(createRepoNock.isDone()).to.equal(true);
+      expect(site.accessToken).to.not.be.null;
     });
 
     it('should respond with a 403 if no user or repository is specified', (done) => {
