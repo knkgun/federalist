@@ -2,6 +2,7 @@
 const inquirer = require('inquirer');
 Promise.props = require('promise-props');
 const BuildLogs = require('../api/services/build-logs');
+const DomainService = require('../api/services/Domain');
 const EventCreator = require('../api/services/EventCreator');
 const cleanDatabase = require('../api/utils/cleanDatabase');
 const {
@@ -259,11 +260,18 @@ async function createData({ githubUsername }) {
     User.upsert({ username: 'davemcorwin', email: 'davemcorwin@example.com', adminEmail: 'david.corwin@gsa.gov' }),
   ]);
 
-  console.log('Crearing Error Events');
+  console.log('Creating Error Events');
   await Promise.all([
     EventCreator.error(Event.labels.REQUEST_HANDLER, new Error('A sample error'), { some: 'info' }),
     EventCreator.error(Event.labels.REQUEST_HANDLER, socketIOError, { some: 'info' }),
   ]);
+
+  console.log('Creating Domains');
+  await DomainService.createDomain(nodeSite, {
+    branch: 'main',
+    name: 'www.example.gov',
+    environment: 'site',
+  });
 }
 
 const confirm = {

@@ -1,13 +1,18 @@
 <script>
   import { notification, router } from '../stores';
   import {
-    fetchBuilds, fetchSite, fetchUsers, updateSite,
+    fetchBuilds,
+    fetchDomains,
+    fetchSite,
+    fetchUsers,
+    updateSite,
 } from '../lib/api';
   import {
     Accordion,
     AccordionContent,
     Await,
     BuildTable,
+    Domains,
     GridContainer,
     PageTitle,
     SiteForm,
@@ -19,6 +24,7 @@
   $: sitePromise = fetchSite(id);
   $: buildsPromise = fetchBuilds({ site: id, limit: 10 });
   $: usersPromise = fetchUsers({ site: id });
+  $: domainsPromise = fetchDomains({ site: id });
 
   async function handleSubmit({ detail }) {
     sitePromise = updateSite(id, detail);
@@ -34,6 +40,11 @@
     <Accordion multiselect bordered>
       <AccordionContent title="User Configuration">
         <p>TBD</p>
+      </AccordionContent>
+      <AccordionContent title="Domains">
+        <Await on={domainsPromise} let:response={domains}>
+          <Domains {domains}/>
+        </Await>
       </AccordionContent>
       <AccordionContent title="Admin Configuration">
         <SiteForm {site} on:submit={handleSubmit} />

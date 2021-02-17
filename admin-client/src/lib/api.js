@@ -55,6 +55,10 @@ function get(path, query) {
   return _fetch(path + qs);
 }
 
+function post(path, body) {
+  return _fetch(path, { method: 'POST', body: JSON.stringify(body) });
+}
+
 function put(path, body) {
   return _fetch(path, { method: 'PUT', body: JSON.stringify(body) });
 }
@@ -92,6 +96,22 @@ async function fetchBuildLog(id) {
   return get(`/builds/${id}/log`).catch(() => null);
 }
 
+async function createDomain(params) {
+  return post('/domains', params).catch(() => null);
+}
+
+async function destroyDomain(id) {
+  return destroy(`/domains/${id}`).catch(() => null);
+}
+
+async function fetchDomain(id) {
+  return get(`/domains/${id}`).catch(() => null);
+}
+
+async function fetchDomains(query = {}) {
+  return get('/domains', query).catch(() => []);
+}
+
 async function fetchEvents(query = {}) {
   return get('/events', query).catch(() => []);
 }
@@ -121,12 +141,16 @@ async function logout() {
 }
 
 export {
+  createDomain,
+  destroyDomain,
   destroySite,
   fetchMe,
   fetchBuildLogEventSource,
   fetchBuild,
   fetchBuilds,
   fetchBuildLog,
+  fetchDomain,
+  fetchDomains,
   fetchEvents,
   fetchSite,
   fetchSites,

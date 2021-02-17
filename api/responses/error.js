@@ -16,7 +16,7 @@ module.exports = (error = {}, { res }) => {
   } else if (error instanceof ValidationError || (error.name && error.name === 'SequelizeValidationError')) {
     finalError = {
       status: 400,
-      message: 'The request parameters were invalid.',
+      message: error.message || 'The request parameters were invalid.',
     };
   } else if (error instanceof DatabaseError) {
     finalError = {

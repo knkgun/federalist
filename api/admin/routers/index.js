@@ -1,5 +1,6 @@
 const { Router } = require('express');
 const AdminBuildController = require('../controllers/build');
+const AdminDomainController = require('../controllers/domain');
 const AdminEventController = require('../controllers/event');
 const AdminSiteController = require('../controllers/site');
 const UserController = require('../controllers/user');
@@ -22,6 +23,10 @@ authenticatedRouter.get('/sites', AdminSiteController.findAllSites);
 authenticatedRouter.get('/sites/:id', AdminSiteController.findById);
 authenticatedRouter.put('/sites/:id', AdminSiteController.update);
 authenticatedRouter.delete('/sites/:id', AdminSiteController.destroy);
+authenticatedRouter.get('/domains', AdminDomainController.list);
+authenticatedRouter.post('/domains', AdminDomainController.create);
+authenticatedRouter.get('/domains/:id', AdminDomainController.findById);
+authenticatedRouter.delete('/domains/:id', AdminDomainController.destroy);
 authenticatedRouter.get('/me', UserController.me);
 authenticatedRouter.get('/users', UserController.list);
 authenticatedRouter.get('/users/:id', UserController.findById);

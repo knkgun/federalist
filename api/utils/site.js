@@ -8,6 +8,10 @@ function siteViewDomain(site) {
   return `https://${site.awsBucketName}.app.cloud.gov`;
 }
 
+function path(site, deployment) {
+  return `/${deployment}/${site.owner}/${site.repository}`;
+}
+
 function siteViewLink(site, deployment = 'site') {
   let link;
   if (deployment === 'site' && site.domain) {
@@ -15,8 +19,7 @@ function siteViewLink(site, deployment = 'site') {
   } else if (deployment === 'demo' && site.demoDomain) {
     link = site.demoDomain;
   } else {
-    const path = `/${deployment}/${site.owner}/${site.repository}`;
-    link = `${siteViewDomain(site)}${path}`;
+    link = `${siteViewDomain(site)}${path(site, deployment)}`;
   }
   return `${link.replace(/\/+$/, '')}/`;
 }
@@ -28,4 +31,4 @@ const hideBasicAuthPassword = ({ username, password }) => {
   return {};
 };
 
-module.exports = { siteViewLink, siteViewDomain, hideBasicAuthPassword };
+module.exports = { path, siteViewLink, siteViewDomain, hideBasicAuthPassword };

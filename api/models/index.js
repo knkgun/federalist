@@ -23,6 +23,7 @@ const UserAction = require('./user-action')(sequelize, DataTypes);
 const ActionType = require('./action-type')(sequelize, DataTypes);
 const UserEnvironmentVariable = require('./user-environment-variable')(sequelize, DataTypes);
 const Event = require('./event')(sequelize, DataTypes);
+const Domain = require('./domain')(sequelize, DataTypes);
 /* eslint-enable no-unused-vars */
 
 Object

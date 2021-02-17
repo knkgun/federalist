@@ -88,6 +88,8 @@ const validBasicAuthUsername = s => /^(?!.*[:])(?=.*[a-zA-Z0-9]).{4,255}$/.test(
 
 const validBasicAuthPassword = s => /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{4,255}$/.test(s);
 
+const isDelimitedFQDN = str => str.split(',').every(s => validator.isFQDN(s));
+
 module.exports = {
   branchRegex,
   shaRegex,
@@ -99,4 +101,5 @@ module.exports = {
   validBasicAuthUsername,
   validBasicAuthPassword,
   isValidSubdomain,
+  isDelimitedFQDN,
 };
