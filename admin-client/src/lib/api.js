@@ -26,20 +26,26 @@ function _setSearchString(query = {}) {
 
 // eslint-disable-next-line no-underscore-dangle
 async function _fetch(path, opts = {}) {
-  return fetch(`${apiUrl}/admin${path}`, { ...defaultOptions, ...opts })
-    .then((r) => {
-      if (r.ok) return r.json();
-      if (r.status === 401) {
-        authLogout();
-        return null;
-      }
-      throw r;
-    })
-    .catch((e) => {
-      notification.setError(`API request failed: ${e.message}`);
-      console.error(e);
-      throw e;
-    });
+  try {
+    const response = await fetch(`${apiUrl}/admin${path}`, { ...defaultOptions, ...opts });
+
+    if (response.status === 401) {
+      authLogout();
+      return null;
+    }
+
+    const json = await response.json();
+
+    if (response.ok) {
+      return json;
+    }
+
+    throw new Error(json.message);
+  } catch (error) {
+    notification.setError(`API request failed: ${error.message}`);
+    console.error(error);
+    throw error;
+  }
 }
 
 function destroy(path) {
@@ -100,8 +106,12 @@ async function createDomain(params) {
   return post('/domains', params).catch(() => null);
 }
 
+async function provisionDomain(id) {
+  return post(`/domains/${id}/provision`).catch(() => null);
+}
+
 async function destroyDomain(id) {
-  return destroy(`/domains/${id}`).catch(() => null);
+  return destroy(`/domains/${id}`).then(() => true).catch(() => null);
 }
 
 async function fetchDomain(id) {
@@ -110,6 +120,10 @@ async function fetchDomain(id) {
 
 async function fetchDomains(query = {}) {
   return get('/domains', query).catch(() => []);
+}
+
+async function fetchDomainDns(id) {
+  return get(`/domains/${id}/dns`).catch(() => []);
 }
 
 async function fetchEvents(query = {}) {
@@ -150,6 +164,7 @@ export {
   fetchBuilds,
   fetchBuildLog,
   fetchDomain,
+  fetchDomainDns,
   fetchDomains,
   fetchEvents,
   fetchSite,
@@ -157,5 +172,6 @@ export {
   fetchUser,
   fetchUsers,
   logout,
+  provisionDomain,
   updateSite,
 };

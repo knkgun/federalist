@@ -2,7 +2,6 @@
   import { notification, router } from '../stores';
   import {
     fetchBuilds,
-    fetchDomains,
     fetchSite,
     fetchUsers,
     updateSite,
@@ -24,7 +23,6 @@
   $: sitePromise = fetchSite(id);
   $: buildsPromise = fetchBuilds({ site: id, limit: 10 });
   $: usersPromise = fetchUsers({ site: id });
-  $: domainsPromise = fetchDomains({ site: id });
 
   async function handleSubmit({ detail }) {
     sitePromise = updateSite(id, detail);
@@ -42,9 +40,7 @@
         <p>TBD</p>
       </AccordionContent>
       <AccordionContent title="Domains">
-        <Await on={domainsPromise} let:response={domains}>
-          <Domains {domains}/>
-        </Await>
+        <Domains siteId={id} />
       </AccordionContent>
       <AccordionContent title="Admin Configuration">
         <SiteForm {site} on:submit={handleSubmit} />

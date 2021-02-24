@@ -5,6 +5,8 @@ export { default as Await } from './Await.svelte';
 export { default as Banner } from './Banner.svelte';
 export { default as BuildTable } from './BuildTable.svelte';
 export { default as DataTable } from './DataTable.svelte';
+export { default as Domain } from './Domain.svelte';
+export { default as DomainForm } from './DomainForm.svelte';
 export { default as Domains } from './Domains.svelte';
 export { default as EventTable } from './EventTable.svelte';
 export { default as ExternalLink } from './ExternalLink.svelte';

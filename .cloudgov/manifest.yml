@@ -42,6 +42,7 @@ applications:
       FEATURE_PROXY_EDGE_DYNAMO: ((feature_proxy_edge_dynamo))
       FEATURE_PROXY_EDGE_LINKS: ((feature_proxy_edge_links))
       AUTH_IDP: ((auth_idp))
+      CF_DOMAIN_WITH_CDN_PLAN_GUID: 440cce96-8989-428b-a60e-91c1393bf3f2
   - name: federalist-admin((env_postfix))
     buildpack: staticfile_buildpack
     path: ../admin-client

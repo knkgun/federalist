@@ -2,6 +2,7 @@ const dns = require('dns').promises;
 const { Domain } = require('../models');
 const { path, siteViewDomain } = require('../utils/site');
 const { ValidationError } = require('../utils/validators');
+const CloudFoundryAPIClient = require('../utils/cfApiClient');
 
 const cloudGovDomain = 'external-domains-production.cloud.gov';
 const acmePrefix = '_acme-challenge';
@@ -15,23 +16,23 @@ function mapState(values, value) {
 }
 
 async function checkCname(domainName, value) {
-  const dns = {
+  const record = {
     type: 'CNAME',
     name: domainName,
   };
 
   try {
     const values = await dns.resolveCname(domainName);
-    dns.state = mapState(values, value);
-  } catch(err) {
+    record.state = mapState(values, value);
+  } catch (err) {
     if (err.message === `queryCname ENOTFOUND ${domainName}`) {
-      dns.state = 'pending';
+      record.state = 'pending';
     } else {
-      dns.state = 'error';
-      dns.message = err.message;
-    };
+      record.state = 'error';
+      record.message = err.message;
+    }
   }
-  return dns;
+  return record;
 }
 
 function checkDnsRecord(domainName) {
@@ -49,7 +50,7 @@ function checkDns(domain) {
 
 function createDomain(site, { name, branch, environment }) {
   if (!['site', 'demo'].includes(environment)) {
-    throw new ValidationError(`Environment value must be 'site' or 'demo'.`);
+    throw new ValidationError('Environment value must be \'site\' or \'demo\'.');
   }
 
   return Domain.create({
@@ -62,14 +63,14 @@ function createDomain(site, { name, branch, environment }) {
   });
 }
 
-function dnsReady(dns) {
-  return dns
+function dnsReady(records) {
+  return records
     .filter(value => value.name.startsWith('_acme-challenge'))
     .every(value => value.status);
 }
 
-async function updateDomain(domain, dns) {
-  if (domain.isDnsPending() && dnsReady(dns)) {
+async function updateDomain(domain, records) {
+  if (domain.isDnsPending() && dnsReady(records)) {
     await domain.update({ state: 'dns_confirmed' });
   }
 }
@@ -79,15 +80,50 @@ async function provisionDomain(domain) {
     throw new ValidationError('Cannot provision domain until acme challenge record(s) are present.');
   }
 
-  // provision
+  const cfApi = new CloudFoundryAPIClient();
+  await cfApi.createExternalDomain(domain);
 
-  await domain.update({ state: 'provisioning '});
+  await domain.update({ state: 'provisioning ' });
+}
+
+async function checkDnsAndUpdateDomain(domain) {
+  const records = await checkDns(domain);
+  await updateDomain(domain, records);
+  return records;
+}
+
+function destroyDomain(domain) {
+  // eventually handle deprovisioning as well
+  return domain.destroy();
+}
+
+async function checkProvisioning(domain) {
+  if (!domain.isProvisioning()) {
+    return;
+  }
+
+  const cfApi = new CloudFoundryAPIClient();
+  const service = await cfApi.fetchServiceInstance(domain.serviceName);
+
+  switch (service.entity.last_operation) {
+    case 'succeeded':
+      await domain.update({ state: 'created' });
+      break;
+    case 'failed':
+      await domain.update({ state: 'failed' });
+      break;
+    default:
+      break;
+  }
 }
 
 module.exports = {
   checkCname,
   checkDns,
+  checkDnsAndUpdateDomain,
+  checkProvisioning,
   createDomain,
+  destroyDomain,
   provisionDomain,
   updateDomain,
 };

@@ -1,17 +1,17 @@
 <script>
   export let state = 'inactive';
 
-  function color(state) {
+  function color(value) {
     return {
       error: 'bg-red',
       inactive: 'bg-gray-30',
       info: 'bg-cyan',
       success: 'bg-mint',
       warning: 'bg-orange',
-    }[state || 'inactive'];
+    }[value || 'inactive'];
   }
 </script>
 
-<span class="usa-tag radius-pill {color(state)} display-flex flex-align-center">
+<span class="usa-tag radius-pill {color(state)} display-inline-flex flex-align-center flex-justify-center">
   <slot></slot>
 </span>

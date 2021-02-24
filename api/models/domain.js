@@ -4,7 +4,7 @@ function associate({ Domain, Site }) {
   Domain.belongsTo(Site, {
     foreignKey: 'siteId',
   });
-};
+}
 
 function define(sequelize, DataTypes) {
   const Domain = sequelize.define('Domain', {
@@ -45,9 +45,9 @@ function define(sequelize, DataTypes) {
   });
 
   Domain.associate = associate;
-  Domain.prototype.isDnsPending = function() { return this.state === 'dns_pending'; };
-  Domain.prototype.isDnsConfirmed = function () { return this.state === 'dns_confirmed'; };
-  Domain.prototype.isProvisioning = function () { return this.state === 'provisioning'; };
+  Domain.prototype.isDnsPending = function isDnsPending() { return this.state === 'dns_pending'; };
+  Domain.prototype.isDnsConfirmed = function isDnsConfirmed() { return this.state === 'dns_confirmed'; };
+  Domain.prototype.isProvisioning = function isProvisioning() { return this.state === 'provisioning'; };
   return Domain;
 }
 

@@ -31,4 +31,6 @@ const hideBasicAuthPassword = ({ username, password }) => {
   return {};
 };
 
-module.exports = { path, siteViewLink, siteViewDomain, hideBasicAuthPassword };
+module.exports = {
+  path, siteViewLink, siteViewDomain, hideBasicAuthPassword,
+};

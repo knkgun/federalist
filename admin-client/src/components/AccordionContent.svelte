@@ -28,7 +28,7 @@
 </h2>
 <div
   id={id}
-  class="usa-accordion__content usa-prose"
+  class="usa-accordion__content"
   {hidden}
 >
   <slot></slot>

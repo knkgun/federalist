@@ -267,11 +267,29 @@ async function createData({ githubUsername }) {
   ]);
 
   console.log('Creating Domains');
-  await DomainService.createDomain(nodeSite, {
-    branch: 'main',
-    name: 'www.example.gov',
-    environment: 'site',
-  });
+  await Promise.all([
+    DomainService.createDomain(site1, {
+      branch: 'main',
+      name: 'www.agency.gov',
+      environment: 'site',
+    }),
+    DomainService.createDomain(nodeSite, {
+      branch: 'main',
+      name: 'www.example.gov',
+      environment: 'site',
+    }),
+    DomainService.createDomain(nodeSite, {
+      branch: 'demo',
+      name: 'demo.example.gov',
+      environment: 'demo',
+    }),
+    DomainService.createDomain(nodeSite, {
+      branch: 'main',
+      name: 'foo.example.gov',
+      environment: 'site',
+    })
+      .then(d => d.update({ state: 'dns_confirmed' })),
+  ]);
 }
 
 const confirm = {

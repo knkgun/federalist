@@ -2,6 +2,7 @@ const { pick } = require('../utils');
 
 const allowedAttributes = [
   'branch',
+  'id',
   'names',
   'state',
 ];
@@ -18,12 +19,12 @@ const extraAttributes = [
 
 function serialize(domain, isSystemAdmin) {
   const object = domain.get({ plain: true });
-  
+
   const attributes = allowedAttributes;
   if (isSystemAdmin) {
     attributes.push(...adminAllowedAttributes);
   }
-  
+
   const filtered = {
     ...pick(attributes, object),
     ...pick(extraAttributes, domain),

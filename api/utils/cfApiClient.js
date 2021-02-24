@@ -37,6 +37,35 @@ class CloudFoundryAPIClient {
       .then(body => body.resources);
   }
 
+  async createExternalDomain(domain) {
+    const spaceGuid = await this.authRequest('GET', '/v3/spaces?names=sites')
+      .then(res => res.resources[0].guid);
+
+    const body = {
+      type: 'managed',
+      name: domain.serviceName,
+      relationships: {
+        space: {
+          data: {
+            guid: spaceGuid,
+          },
+        },
+        service_plan: {
+          data: {
+            guid: config.env.cfDomainWithCdnPlanGuid,
+          },
+        },
+      },
+      parameters: {
+        domains: domain.names,
+        origin: domain.origin,
+        path: domain.path,
+      },
+    };
+
+    return this.authRequest('POST', '/v3/service_instances', body);
+  }
+
   createRoute(name) {
     const body = {
       domain_guid: config.env.cfDomainGuid,

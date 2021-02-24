@@ -12,11 +12,13 @@ module.exports = wrapHandlers({
 
     const domains = await Domain.findAll({ where: { siteId } });
 
-    await Promise.all(domains.map(async domain => {
-      domain.dns = await DomainService.checkDns(domain);
-    }));
-
-    return res.json(serializeMany(domains, true));
+    const json = {
+      meta: {
+        environments: ['site', 'demo'],
+      },
+      data: serializeMany(domains, true),
+    };
+    return res.json(json);
   },
 
   async findById(req, res) {
@@ -28,8 +30,8 @@ module.exports = wrapHandlers({
     if (!domain) {
       return res.notFound();
     }
-    
-    domain.dns = await DomainService.checkDns(domain);
+
+    await DomainService.checkProvisioning(domain);
 
     return res.json(serialize(domain, true));
   },
@@ -41,7 +43,7 @@ module.exports = wrapHandlers({
         branch,
         environment,
         siteId,
-      }
+      },
     } = req;
 
     const site = await fetchModelById(siteId, Site);
@@ -51,11 +53,7 @@ module.exports = wrapHandlers({
 
     const domain = await DomainService.createDomain(site, { branch, environment, name });
 
-    const dns = await DomainService.checkDns(domain);
-
-    await DomainService.updateDomain(domain, dns);
-
-    domain.dns = dns;
+    await DomainService.checkDnsAndUpdateDomain(domain);
 
     return res.json(serialize(domain, true));
   },
@@ -70,9 +68,9 @@ module.exports = wrapHandlers({
       return res.notFound();
     }
 
-    await domain.destroy();
+    await DomainService.destroyDomain(domain);
 
-    return res.ok();
+    return res.json({});
   },
 
   async provision(req, res) {
@@ -87,8 +85,21 @@ module.exports = wrapHandlers({
 
     await DomainService.provisionDomain(domain);
 
-    domain.dns = await DomainService.checkDns(domain);
-
     return res.json(serialize(domain, true));
+  },
+
+  async dns(req, res) {
+    const {
+      params: { id },
+    } = req;
+
+    const domain = await fetchModelById(id, Domain);
+    if (!domain) {
+      return res.notFound();
+    }
+
+    const dns = await DomainService.checkDnsAndUpdateDomain(domain);
+
+    return res.json(dns);
   },
 });

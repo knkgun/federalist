@@ -88,6 +88,7 @@ const cfDomain = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-domai
 const cfProxy = appEnv.getServiceCreds(`federalist-${process.env.APP_ENV}-proxy`);
 const cfOauthTokenUrl = process.env.CLOUD_FOUNDRY_OAUTH_TOKEN_URL;
 const cfApiHost = process.env.CLOUD_FOUNDRY_API_HOST;
+const cfDomainWithCdnPlanGuid = process.env.CF_DOMAIN_WITH_CDN_PLAN_GUID;
 // optional environment vaiables
 const newRelicAppName = process.env.NEW_RELIC_APP_NAME;
 const newRelicLicenseKey = process.env.NEW_RELIC_LICENSE_KEY;
@@ -97,6 +98,7 @@ if (cfSpace && cfOauthTokenUrl && cfApiHost && cfDomain && cfProxy) {
     cfDomainGuid: cfDomain.guid,
     cfProxyGuid: cfProxy.guid,
     cfSpaceGuid: cfSpace.guid,
+    cfDomainWithCdnPlanGuid,
     cfOauthTokenUrl,
     cfApiHost,
     newRelicAppName,
