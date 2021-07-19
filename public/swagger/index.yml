@@ -269,9 +269,6 @@ paths:
                     email:
                       type: string
                       description: the UAA email for the invited user
-                    link:
-                      type: string
-                      description: The confirmation link for the invited user
         400:
           description: Bad request
           schema:

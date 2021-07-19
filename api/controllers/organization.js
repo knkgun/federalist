@@ -55,7 +55,7 @@ module.exports = wrapHandlers({
 
     const json = {
       member: organizationRoleSerializer.serialize(member),
-      invite: { email, link },
+      invite: { email },
     };
 
     return res.json(json);

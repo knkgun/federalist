@@ -20,9 +20,9 @@ function successNotification(message) {
   });
 }
 
-function showInviteAlert(email, link) {
+function showInviteAlert(email) {
   // eslint-disable-next-line no-alert
-  return window.alert(`${email} does not have cloud.gov account yet, please send them the following link to get started:\n\n${link}`);
+  return window.alert(`${email} has been added to your organization. If they are new to the platform, they will receive an email with an invitation to join and will be able access the platform once they accept.`);
 }
 
 function showRemoveConfirm(member, org) {
@@ -122,11 +122,9 @@ function Edit({ actions, id }) {
               data => actions.inviteToOrganization(org.id, data)
             }
             onSubmitSuccess={
-              ({ member, invite: { email, link } }, reduxDispatch) => {
+              ({ member, invite: { email } }, reduxDispatch) => {
                 dispatch({ type: 'addMember', payload: member });
-                if (link) {
-                  showInviteAlert(email, link);
-                }
+                showInviteAlert(email);
                 reduxDispatch(successNotification('Successfully added user.'));
               }
             }
