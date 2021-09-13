@@ -9,6 +9,8 @@ describe('Mailer', () => {
       const password = 'password';
       const username = 'username';
       const to = ['foo@bar.com'];
+      const cc = ['foo-cc@bar.com'];
+      const bcc = ['foo-bcc@bar.com'];
       const subject = 'This is only a test';
       const html = '<p>For real, only a test<p>';
 
@@ -19,10 +21,10 @@ describe('Mailer', () => {
           authorization: `Basic ${Buffer.from(`${username}:${password}`).toString('Base64')}`,
         },
       })
-        .post('/send', { html, subject, to })
+        .post('/send', { html, subject, to, cc, bcc })
         .reply(200);
 
-      await mailer.send({ html, subject, to });
+      await mailer.send({ html, subject, to, cc, bcc });
 
       scope.done();
     });
